@@ -2,6 +2,7 @@ import requests
 import datetime
 import json
 import dpath.util
+import os
 from dotenv import load_dotenv
 from tqdm import tqdm
 from time import sleep
@@ -16,9 +17,9 @@ class PicsGrabber:
     def __init__(self):
         self.api_vk_version = '5.131'
         self.url_dict = {}
-        self.id = ID
-        self.vk_token = VK_Token
-        self.yandex_token = YANDEX_TOKEN
+        self.id = os.getenv('ID')
+        self.vk_token = os.getenv('VK_TOKEN')
+        self.yandex_token = os.getenv('YANDEX_TOKEN')
 
     def grab_vk(self):
         user_id = input('Введите ID пользователя, фотографии которого вы хотите импортировать:\n')
@@ -149,4 +150,3 @@ if __name__ == '__main__':
     print('Приветствую Вас в программе "PicsGrabber"!')
     while True:
         my_grabber.greeting()
-
