@@ -1,0 +1,4 @@
+requests~=2.25.1
+dpath~=2.0.1
+python-dotenv~=0.17.1
+tqdm~=4.61.2
