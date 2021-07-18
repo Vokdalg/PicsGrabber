@@ -4,9 +4,8 @@ import json
 import dpath.util
 import os
 from google.oauth2 import service_account
-from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
+from googleapiclient.http import MediaFileUpload
 from googleapiclient.discovery import build
-import io
 from dotenv import load_dotenv
 from tqdm import tqdm
 from time import sleep
@@ -15,42 +14,41 @@ from pprint import pprint
 load_dotenv()
 
 
-# class GDUploader:
-#
-#     def gd_folder_maker(self, url_dict):
-#         dir_name = input('Введите имя папки, которую хотите создать на своем Google Drive:\n')
-#         scopes = ['https://www.googleapis.com/auth/drive']
-#         credentials = service_account.Credentials.from_service_account_file(
-#             MainMenu.service_account_file, scopes=scopes)
-#         service = build('drive', 'v3', credentials=credentials)
-#
-#         folder_id = '1JKG3skCRR8xdzA26mzrX7r6NkwZAsb5E'
-#         file_metadata = {
-#             'name': dir_name,
-#             'mimeType': 'application/vnd.google-apps.folder',
-#             'parents': [folder_id]
-#         }
-#         response = service.files().create(body=file_metadata, fields='id').execute()
-#         for id, number in response.items():
-#             dir_name = number
-#         self.gd_upload(dir_name, url_dict)
-#
-#     def gd_upload(self, dir_name, url_dict):
-#         print(dir_name)
-#         scopes = ['https://www.googleapis.com/auth/drive']
-#         credentials = service_account.Credentials.from_service_account_file(
-#             MainMenu.service_account_file, scopes=scopes)
-#         service = build('drive', 'v3', credentials=credentials)
-#         for filename, url in tqdm(url_dict.items(), desc='Photos uploading'):
-#             sleep(.1)
-#             file_path = url
-#             file_metadata = {
-#                 'name': filename,
-#                 'parents': [dir_name]
-#             }
-#             media = MediaFileUpload(file_path, resumable=True)
-#             r = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-#             pprint(r)
+class GDUploader:
+
+    def gd_folder_maker(self):
+        dir_name = input('Введите имя папки, которую хотите создать на своем Google Drive:\n')
+        scopes = ['https://www.googleapis.com/auth/drive']
+        credentials = service_account.Credentials.from_service_account_file(MainMenu.service_account_file, scopes=scopes)
+        service = build('drive', 'v3', credentials=credentials)
+        folder_id = '1JKG3skCRR8xdzA26mzrX7r6NkwZAsb5E'
+        file_metadata = {
+            'name': dir_name,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [folder_id]
+        }
+        response = service.files().create(body=file_metadata, fields='id').execute()
+        for id, number in response.items():
+            MainMenu.dir_name = number
+        GDUploader.gd_upload(self)
+
+    def gd_upload(self):
+        scopes = ['https://www.googleapis.com/auth/drive']
+        credentials = service_account.Credentials.from_service_account_file(MainMenu.service_account_file, scopes=scopes)
+        service = build('drive', 'v3', credentials=credentials)
+        for filename, url in tqdm(MainMenu.url_dict.items(), desc='Photos uploading'):
+            sleep(.1)
+            r = requests.get(url)
+            with open(filename, "wb") as f:
+                f.write(r.content)
+            file_path = filename
+            file_metadata = {
+                'name': filename,
+                'parents': [MainMenu.dir_name]
+            }
+            media = MediaFileUpload(file_path, resumable=True)
+            response = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+            os.remove(filename)
 
 
 class VKGrabber:
