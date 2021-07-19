@@ -9,7 +9,6 @@ from googleapiclient.discovery import build
 from dotenv import load_dotenv
 from tqdm import tqdm
 from time import sleep
-from pprint import pprint
 
 load_dotenv()
 
